@@ -1,17 +1,4 @@
-module WorldMaths(
-addFace,
-addFaceList,
-vectorPlaneIntersectionScalar,
-vectorPlaneIntersection,
-vectorPlaneIntersectionCheck,
-insertIntoFacelistVector,
-sortFacesByDistanceFromPoint,
-removeFacesNeverHit,
-makeNewFaceList,
-getFirstFaceHit,
-checkForFace,
-checkIfValidFaceList
-)
+module WorldMaths
 where
 
 import DataTypes
@@ -96,7 +83,7 @@ makeNewFaceList facelist vector coordinate = sortFacesByDistanceFromPoint
 
 getFirstFaceHiti :: [Face] -> Coordinate -> Vector -> Int -> Face
 getFirstFaceHiti facelist vectorOrigin vector count
-   | count == (length facelist) = (([],(0,(0,0))),0) --no face
+   | count == (length facelist) = (([],(0,(0,0))),'0') --no face
    | checkForFace (facelist!!count) vectorOrigin vector = facelist!!count
    | otherwise = getFirstFaceHiti facelist vectorOrigin vector (count+1)
 

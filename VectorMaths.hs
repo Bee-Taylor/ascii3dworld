@@ -59,8 +59,11 @@ crossProduct a b = (((getVectorElement a 1) * (getVectorElement b 2) - (getVecto
                      (getVectorElement a 0) * (getVectorElement b 1) - (getVectorElement a 1) * (getVectorElement b 0))
 
 -- |"findAngleBetweenVectors" returns the angle between two vectors, in radians
-findAngleBetweenVectors:: Vector -> Vector -> Float
-findAngleBetweenVectors a b = (acos ((dotProduct a b) / ((getVectorLength a) *(getVectorLength b))))
+findAngleBetweenVectorsi:: Vector -> Vector -> Float
+findAngleBetweenVectorsi a b = (acos ((dotProduct a b) / ((getVectorLength a) *(getVectorLength b))))
+
+findAngleBetweenVectors :: Vector -> Vector -> Float
+findAngleBetweenVectors a b = 3.1415927 - findAngleBetweenVectorsi a b
 
 -- |"scaleVector" takes a vector and multiplies each element by a float
 scaleVector :: Vector -> Float -> Vector

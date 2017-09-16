@@ -12,12 +12,14 @@ import VectorMaths
 import GeneralUtility
 import WorldMaths
 import FaceMaths
+import Camera
+import AnsiiOutput
 
 newWorld :: World
 newWorld = (([],0.5), [])
 
-makeSquareFace :: Coordinate -> Float -> Vector -> Float -> Vector -> Coefficients -> Face
-makeSquareFace bottomLeftCoordinate height upDirection width rightDirection coefficients
+makeSquareFace :: Coordinate -> Float -> Vector -> Float -> Vector -> Coefficients -> Char -> Face
+makeSquareFace bottomLeftCoordinate height upDirection width rightDirection coefficients id
     | width  == 0 = error "width  = 0"
     | height == 0 = error "height = 0"
     | not (approximatelyEquals (findAngleBetweenVectors upDirection rightDirection) 1.5708) =
@@ -28,7 +30,7 @@ makeSquareFace bottomLeftCoordinate height upDirection width rightDirection coef
                                                                     (scaleVector (normaliseVector upDirection) height)
                                                                     (scaleVector (normaliseVector rightDirection) width)),
                     addVectorToCoordinate bottomLeftCoordinate (scaleVector (normaliseVector upDirection) height)],
-                    coefficients), 0)
+                    coefficients), id)
 
 makeCube :: Coordinate -> Float -> Float -> Float -> Vector -> Vector -> Vector -> Coefficients -> FaceList
 makeCube baseCoordinate width height depth upDirection rightDirection backDirection coefficients
@@ -42,9 +44,9 @@ makeCube baseCoordinate width height depth upDirection rightDirection backDirect
     | not (approximatelyEquals (findAngleBetweenVectors backDirection rightDirection) 1.5708) =
                     error "upDirection and backDirection not perpendicular"
     | otherwise = [
-        makeSquareFace baseCoordinate height upDirection width rightDirection coefficients ,
-        makeSquareFace baseCoordinate depth backDirection width rightDirection coefficients ,
-        makeSquareFace baseCoordinate height upDirection depth backDirection coefficients ,
+        makeSquareFace baseCoordinate height upDirection width rightDirection coefficients 'N',
+        makeSquareFace baseCoordinate depth backDirection width rightDirection coefficients 'N',
+        makeSquareFace baseCoordinate height upDirection depth backDirection coefficients 'N',
         makeSquareFace  (addVectorToCoordinate
                             baseCoordinate
                             (addVectorToCoordinate
@@ -54,7 +56,7 @@ makeCube baseCoordinate width height depth upDirection rightDirection backDirect
                                 (scaleVector (normaliseVector backDirection) depth)))
                         (-height) upDirection
                         (-width ) rightDirection
-                        coefficients ,
+                        coefficients '*',
         makeSquareFace  (addVectorToCoordinate
                             baseCoordinate
                             (addVectorToCoordinate
@@ -64,7 +66,7 @@ makeCube baseCoordinate width height depth upDirection rightDirection backDirect
                                 (scaleVector (normaliseVector backDirection) depth)))
                         (-depth) backDirection
                         (-width) rightDirection
-                        coefficients ,
+                        coefficients 'X',
         makeSquareFace  (addVectorToCoordinate
                             baseCoordinate
                             (addVectorToCoordinate
@@ -74,9 +76,18 @@ makeCube baseCoordinate width height depth upDirection rightDirection backDirect
                                 (scaleVector (normaliseVector backDirection) depth)))
                         (-height) upDirection
                         (-depth ) backDirection
-                        coefficients
+                        coefficients '\\'
         ]
 
+firstWorld :: World
+firstWorld = addFaceList (newWorld) (makeCube ((0,0),0) 1 1 1 ((1,0),0) ((0,1),0) ((0,0),1) (0,(0,0)))
+
+run :: IO()
+run = do
+    let world  = firstWorld
+    let camera = makeExampleCamera
+    let image  = cameraRun world camera
+    outputAsciiImage image
 
 --addFace world ([((0,0),0),((1,0),0),((1,1),0),((0,1),0)],(0,(0,0)))
 --insertIntoFacelistVector [([((0,0),0),((1,1),0),((0,1),0)],(0,(0,0))), ([((0,0),1),((1,0),1),((0,1),1)],(0,(0,0)))] ([((0,0),1),((0,1),1),((1,0),1)],(0,(0,0))) ((0,0),1) ((0,0),-5) 0
